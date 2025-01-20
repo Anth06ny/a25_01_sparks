@@ -1,0 +1,7 @@
+POST http://localhost:8080/receiveStudent
+Content-Type: application/json
+
+{
+  "name": "",
+  "note": 0
+}
