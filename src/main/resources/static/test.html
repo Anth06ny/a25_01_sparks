@@ -1,0 +1,110 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test HTTP Requests</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result .alert {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">Test HTTP Requests</h1>
+    <form id="testForm">
+        <div class="form-group">
+            <label for="url">URL:</label>
+            <input type="text" class="form-control" id="url" placeholder="Enter URL" required value="http://localhost:8080/">
+        </div>
+        <div class="form-group">
+            <label for="method">Method:</label>
+            <select class="form-control" id="method" required>
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="jsonInput">JSON Input:</label>
+            <textarea class="form-control" id="jsonInput" rows="5" placeholder="Enter JSON here"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-paper-plane"></i> Test</button>
+    </form>
+    <div id="result" class="result">
+        <div id="status" class="alert" role="alert"></div>
+        <div id="response" class="alert alert-secondary" role="alert"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    document.getElementById('testForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const url = document.getElementById('url').value;
+        const method = document.getElementById('method').value;
+        let jsonInput = document.getElementById('jsonInput').value;
+
+        try {
+            if (jsonInput) {
+                JSON.parse(jsonInput);
+            }
+        } catch (e) {
+            showError('Invalid JSON format.');
+            return;
+        }
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: jsonInput ? jsonInput : null
+        })
+            .then(response => response.text().then(text => ({status: response.status, body: text})))
+            .then(result => {
+                showResult(result.status, result.body);
+            })
+            .catch(error => {
+                showError('Error: ' + error.message);
+            });
+    });
+
+    function showResult(status, body) {
+        const statusElement = document.getElementById('status');
+        const responseElement = document.getElementById('response');
+
+        statusElement.className = 'alert';
+        if (status >= 200 && status < 300) {
+            statusElement.classList.add('alert-success');
+        } else {
+            statusElement.classList.add('alert-danger');
+        }
+        statusElement.textContent = 'Status: ' + status;
+        responseElement.textContent = body;
+    }
+
+    function showError(message) {
+        const statusElement = document.getElementById('status');
+        const responseElement = document.getElementById('response');
+
+        statusElement.className = 'alert alert-danger';
+        statusElement.textContent = message;
+        responseElement.textContent = '';
+    }
+</script>
+</body>
+</html>

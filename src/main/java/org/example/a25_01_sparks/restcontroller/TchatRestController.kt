@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.example.a25_01_sparks.model.MessageBean
+import org.example.a25_01_sparks.model.MessageService
 import org.springframework.web.bind.annotation.*
 
 //@Tag, @Operation,  @ApiResponses :  pour la documentation avec Swagger
@@ -16,9 +18,9 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/tchat")
 @Tag(name = "Tchat", description = "API pour gérer les messages d'un tchat")
-class TchatRestController {
+class TchatRestController(val messageService: MessageService) {
 
-    private val list: MutableList<MessageBean> = ArrayList()
+    //private val list: MutableList<MessageBean> = ArrayList()
 
     //Jeu de données
     //init {
@@ -43,11 +45,12 @@ class TchatRestController {
         ]
     )
     @PostMapping("/saveMessage")
-    fun saveMessage(@RequestBody message: MessageBean) {
+    fun saveMessage(@Valid @RequestBody message: MessageBean) {
         println("/saveMessage : ${message.message} : ${message.pseudo}")
-        list.add(message)
+        messageService.addMessage(message)
     }
 
+    //http://localhost:8080/tchat/allMessages
     @Operation(
         summary = "Obtenir les derniers messages",
         description = "Récupère les 10 derniers messages enregistrés dans le tchat"
@@ -69,19 +72,19 @@ class TchatRestController {
         println("/allMessages")
 
         // Pour ne retourner que les 10 derniers
-        return list.takeLast(10)
+        return messageService.get10Last() //list.takeLast(10)
     }
 
-    // http://localhost:8080/tchat/filter?filter=coucou&pseudo=toto
-    @GetMapping("/filter")
-    fun filter(filter: String? = null, pseudo: String? = null): List<MessageBean> {
-        println("/filter filter=$filter pseudo=$pseudo")
-
-        return list.filter {
-            //Soit on n'a pas de filtre soit on garde ceux qui correspondent aux filtres
-            (filter == null || it.message.contains(filter, true))
-                    &&
-                    (pseudo == null || it.pseudo.equals(pseudo, true))
-        }
-    }
+//    // http://localhost:8080/tchat/filter?filter=coucou&pseudo=toto
+//    @GetMapping("/filter")
+//    fun filter(filter: String? = null, pseudo: String? = null): List<MessageBean> {
+//        println("/filter filter=$filter pseudo=$pseudo")
+//
+//        return list.filter {
+//            //Soit on n'a pas de filtre soit on garde ceux qui correspondent aux filtres
+//            (filter == null || it.message.contains(filter, true))
+//                    &&
+//                    (pseudo == null || it.pseudo.equals(pseudo, true))
+//        }
+//    }
 }

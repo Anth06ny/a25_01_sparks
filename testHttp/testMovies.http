@@ -1,0 +1,43 @@
+//GET All
+GET http://localhost:8082/movies
+Content-Type: application/json
+
+###
+
+//Création
+POST http://localhost:8082/movies
+Content-Type: application/json
+
+{"title":"toto", "length":"120"}
+
+###
+
+//GET 1
+GET http://localhost:8082/movies/1
+Content-Type: application/json
+###
+
+//Remplace
+PUT http://localhost:8082/movies/2
+Content-Type: application/json
+
+{"title":"blabla" , "length":"130"}
+###
+
+//Mise à jour partielle
+PATCH http://localhost:8082/movies/2
+Content-Type: application/json
+
+{"title":"tata"}
+###
+
+//GET All
+GET http://localhost:8082/movies
+Content-Type: application/json
+###
+
+//Suppression
+DELETE http://localhost:8082/movies/2
+Content-Type: application/json
+
+###
